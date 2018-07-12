@@ -289,7 +289,7 @@ func (c *Client) buildURL(path string, params map[string]string) (string, error)
 	if err != nil {
 		return "", err
 	}
-	u.Path = path
+	u.Path += path
 
 	queryString := u.Query()
 	for k, v := range params {
