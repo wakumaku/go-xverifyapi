@@ -5,6 +5,7 @@ package xverifyapi
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -52,24 +53,24 @@ var (
 
 // Response with some possible fields. Need to add more fields and split between email, phone etc responses, xverify api docs are broken and a mess...
 type Response struct {
-	Address     string   `json:"address,omitempty"` // This tag contains the same email address which was entered in the request.
-	Syntax      string   `json:"syntax,omitempty"`  // This helps you identify if the email address is in the correct format. If the response is 1 then the email format is good, if the response is 0 then it means the format of the email address is incorrect.
-	Handle      string   `json:"handle,omitempty"`  // This field contains the username part of the email ID. This is the characters before the @ symbol.
-	Domain      string   `json:"domain,omitempty"`  // This is the domain name of the email ID, the characters after the @ symbol.
-	Error       int      `json:"error,omitempty"`   // This helps you identify if there was an error with your request. When this tag displays “0” then there is no error. Anything else in this tag will indicate there is a problem with the request.
-	Status      string   `json:"status,omitempty"`  // This tag lets you know if the email address you supplied was either valid of invalid. Valid email addresses are deliverable, and invalid email addresses are not.
+	Address string `json:"address"` // This tag contains the same email address which was entered in the request.
+	Syntax  string `json:"syntax"`  // This helps you identify if the email address is in the correct format. If the response is 1 then the email format is good, if the response is 0 then it means the format of the email address is incorrect.
+	Handle  string `json:"handle"`  // This field contains the username part of the email ID. This is the characters before the @ symbol.
+	Domain  string `json:"domain"`  // This is the domain name of the email ID, the characters after the @ symbol.
+	// Error       int      `json:"error"`   // This helps you identify if there was an error with your request. When this tag displays “0” then there is no error. Anything else in this tag will indicate there is a problem with the request.
+	Status      string   `json:"status"` // This tag lets you know if the email address you supplied was either valid of invalid. Valid email addresses are deliverable, and invalid email addresses are not.
 	AutoCorrect struct { // We are able to auto correct misspellings of major domain names. If the auto correct feature is enabled in your account then the corrected tag will display true and immediately below that you will see an address tag which will display the corrected email address. IF you have auto-correction enabled, but no corrected occurred then you will see that the corrected tag will display false.
-		Corrected string `json:"corrected,omitempty"`
-		Address   string `json:"address,omitempty"`
-	} `json:"auto_correct,omitempty"`
-	Message string `json:"message,omitempty"` // The message tag helps provide more details that help explain the response code.
-	// Duration          float32 `json:"duration,omitempty"`     // This tag indicates the total execution time for the request.
-	CatchAll          string `json:"catch_all,omitempty"`    // This helps you indicate if the email server domain is configured as a catch-all mail server. The results here will display (yes, no, or unknown). Learn more about catch-all domains.
-	Responsecode      int    `json:"responsecode,omitempty"` // HTTP status code (when error)
+		Corrected string `json:"corrected"`
+		Address   string `json:"address"`
+	} `json:"auto_correct"`
+	Message string `json:"message"` // The message tag helps provide more details that help explain the response code.
+	// Duration          float32 `json:"duration"`     // This tag indicates the total execution time for the request.
+	CatchAll          string `json:"catch_all"`    // This helps you indicate if the email server domain is configured as a catch-all mail server. The results here will display (yes, no, or unknown). Learn more about catch-all domains.
+	Responsecode      int    `json:"responsecode"` // HTTP status code (when error)
 	AreaCode          int
 	Prefix            int
 	Sufix             int
-	TransactionNumber string `json:"transaction_number,omitempty"`
+	TransactionNumber string `json:"transaction_number"`
 }
 
 // Client holding credentials and connection
@@ -261,6 +262,7 @@ func (c *Client) parseBody(body []byte) (*Response, error) {
 		if err == nil {
 			return &response, nil
 		}
+		fmt.Println(err)
 		break // Exit from loop, we only want the firs node (probably the only one)
 	}
 

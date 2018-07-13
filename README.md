@@ -12,3 +12,6 @@ verified, err := client.IsEmailVerified("email@domain.tld")
 
 Makefile:
 * `make test` Runs tests
+
+### TODO
+* Better response fields handling due to incoherent types received like Error or Duration that can be int or string depending on the request ¯\_(ツ)_/¯

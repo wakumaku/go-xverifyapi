@@ -37,14 +37,14 @@ var validResponse = `{
         "syntax":"syntax",
         "handle":"handle",
         "domain":"domain",
-        "error":"error",
+        "error":0,
         "status":"valid",
         "auto_correct": {
             "corrected":"corrected",
             "address":"address"
         },
         "message":"message",
-        "duration":"duration",
+        "duration":0.0,
         "catch_all":"catch_all",
         "responsecode":200,
         "transaction_number":"123-456-abcd"
