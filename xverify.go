@@ -34,7 +34,7 @@ const (
 // Endpoints endpoint definitions
 var Endpoints = map[ServiceType]string{
 	Phone:            "/phone/verify",
-	Emails:           "/email/verify",
+	Emails:           "/emails/verify",
 	Address:          "/address/verify",
 	Scoring:          "/scoring/verify",
 	AllServices:      "/allservices/verify",
@@ -56,14 +56,14 @@ type Response struct {
 	Syntax      string   `json:"syntax,omitempty"`  // This helps you identify if the email address is in the correct format. If the response is 1 then the email format is good, if the response is 0 then it means the format of the email address is incorrect.
 	Handle      string   `json:"handle,omitempty"`  // This field contains the username part of the email ID. This is the characters before the @ symbol.
 	Domain      string   `json:"domain,omitempty"`  // This is the domain name of the email ID, the characters after the @ symbol.
-	Error       string   `json:"error,omitempty"`   // This helps you identify if there was an error with your request. When this tag displays “0” then there is no error. Anything else in this tag will indicate there is a problem with the request.
+	Error       int      `json:"error,omitempty"`   // This helps you identify if there was an error with your request. When this tag displays “0” then there is no error. Anything else in this tag will indicate there is a problem with the request.
 	Status      string   `json:"status,omitempty"`  // This tag lets you know if the email address you supplied was either valid of invalid. Valid email addresses are deliverable, and invalid email addresses are not.
 	AutoCorrect struct { // We are able to auto correct misspellings of major domain names. If the auto correct feature is enabled in your account then the corrected tag will display true and immediately below that you will see an address tag which will display the corrected email address. IF you have auto-correction enabled, but no corrected occurred then you will see that the corrected tag will display false.
 		Corrected string `json:"corrected,omitempty"`
 		Address   string `json:"address,omitempty"`
 	} `json:"auto_correct,omitempty"`
-	Message           string `json:"message,omitempty"`      // The message tag helps provide more details that help explain the response code.
-	Duration          string `json:"duration,omitempty"`     // This tag indicates the total execution time for the request.
+	Message string `json:"message,omitempty"` // The message tag helps provide more details that help explain the response code.
+	// Duration          float32 `json:"duration,omitempty"`     // This tag indicates the total execution time for the request.
 	CatchAll          string `json:"catch_all,omitempty"`    // This helps you indicate if the email server domain is configured as a catch-all mail server. The results here will display (yes, no, or unknown). Learn more about catch-all domains.
 	Responsecode      int    `json:"responsecode,omitempty"` // HTTP status code (when error)
 	AreaCode          int
@@ -236,7 +236,6 @@ func (c *Client) callService(service ServiceType, params map[string]string) (*Re
 		r = &Response{
 			Responsecode: statusCode,
 			Message:      err.Error(),
-			Error:        err.Error(),
 		}
 		return nil, err
 	}
@@ -252,8 +251,8 @@ func (c *Client) parseBody(body []byte) (*Response, error) {
 	}
 
 	// Need to pick the first item
-	for _, response := range wrapper {
-		r, err := json.Marshal(response)
+	for _, value := range wrapper {
+		r, err := json.Marshal(value)
 		if err != nil {
 			return nil, err
 		}
@@ -275,7 +274,6 @@ func (c *Client) buildRequest(method, path string, params map[string]string, bod
 	params["type"] = "json"
 
 	URL, err := c.buildURL(path, params)
-
 	if err != nil {
 		return nil, err
 	}
